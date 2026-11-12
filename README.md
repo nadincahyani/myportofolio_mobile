@@ -39,7 +39,7 @@ Kelas : PBP E
 
 ## AI Disclosure
 - Tool yang Digunakan: Google Gemini
-- Tautan Log / Sesi percakapan: [Sesi Percakapan Gemini]( )
+- Tautan Log / Sesi percakapan: [Sesi Percakapan Gemini](https://share.gemini.google/4IyTTNW2Asf5)
 - Strategi Prompting:
   1. Mengonsultasikan panduan instalasi Dart SDK di Windows melalui beberapa pilihan metode (winget, Chocolatey, atau manual ZIP) serta menentukan opsi paling praktis.
   2. Meminta verifikasi terkait penempatan direktori proyek Flutter di folder lokal profil pengguna serta penanganan peringatan path ganda antara Dart bawaan Flutter dan winget.
