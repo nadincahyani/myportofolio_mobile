@@ -90,7 +90,13 @@ Contohnya, jika pengguna mengisi bagian Role / Position hanya dengan spasi seper
 Pemilihan jenis input dan keyboard saja belum cukup untuk memastikan data yang dimasukkan benar. Misalnya, penggunaan keyboard teks hanya memudahkan pengguna dalam mengetik, tetapi tidak bisa memastikan bahwa input tidak kosong atau hanya berisi spasi. Begitu juga dengan pemilihan tanggal, yang belum tentu mencegah pengguna memilih tanggal selesai sebelum tanggal mulai. Oleh karena itu, tetap diperlukan validasi untuk memastikan data yang disimpan sudah memenuhi ketentuan.
 
 ## AI Disclosure
-- Tool yang Digunakan: Google Gemini
-- Tautan Log / Sesi percakapan: [Sesi Percakapan Gemini]()
+- Tool yang Digunakan: ChatGPT
+- Tautan Log / Sesi percakapan: [Sesi Percakapan](https://chatgpt.com/share/6b0438a5-6194-83ec-a075-d88125e1b920)
 - Strategi Prompting:
+Menggunakan pendekatan diskusi secara bertahap dengan mengajukan pertanyaan mengenai konsep dan implementasi Flutter yang digunakan dalam tugas. Diskusi dimulai dari memahami perbedaan metode navigasi (Navigator.push(), Navigator.pushReplacement(), dan Navigator.pop()), penggunaan Scaffold, AppBar, dan Drawer, hingga menentukan susunan widget yang sesuai untuk formulir. Selanjutnya, diskusi dilanjutkan dengan menanyakan cara menggunakan showDatePicker(), menyimpan tanggal yang dipilih, serta menggabungkan validasi tanggal dengan validasi TextFormField. Ketika ditemukan error saat menjalankan aplikasi, percakapan dilanjutkan dengan membahas kemungkinan penyebab dan langkah untuk memeriksanya.
+
 - Bagian yang Dibantu AI:
+Membantu memahami konsep navigasi dan struktur layout Flutter, memberikan arahan dalam menyusun formulir Experience, menjelaskan penggunaan DateTime, showDatePicker(), GlobalKey<FormState>, dan validator, serta membantu menganalisis error No MaterialLocalizations found dan kemungkinan perbaikannya. AI juga membantu memberikan gambaran implementasi kode dan menjelaskan fungsi dari setiap bagian agar lebih mudah dipahami dan disesuaikan dengan proyek yang sedang dikerjakan.
+
+- Keterbatasan AI & Perbaikan Mandiri:
+AI terkadang memberikan contoh implementasi yang belum sepenuhnya sesuai dengan struktur proyek yang sudah ada, sehingga kode yang diberikan tidak selalu bisa langsung digunakan. Selain itu, saran perbaikan error masih perlu disesuaikan dengan kondisi proyek. Oleh karena itu, dilakukan pemeriksaan dan penyesuaian kode secara mandiri, terutama pada bagian navigasi, validasi tanggal, dan struktur widget. Error yang muncul saat aplikasi dijalankan juga ditelusuri kembali dengan memeriksa konfigurasi MaterialApp dan localization. Pengujian dilakukan secara langsung untuk memastikan fitur dapat berjalan sesuai kebutuhan tugas.
