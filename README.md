@@ -55,3 +55,42 @@ Kelas : PBP E
 - Keterbatasan AI & Perbaikan Mandiri:
   1. AI memberikan panduan teoritis dan langkah-langkah administratif sistem operasi, namun eksekusi langsung perubahan Environment Variables, restart terminal, dan verifikasi perangkat menggunakan `flutter devices` dilakukan secara mandiri di komputer lokal.
   2. Pengujian perintah `flutter run -d chrome` serta pengecekan visual aplikasi di peramban Google Chrome dijalankan dan diverifikasi secara langsung oleh pengguna.
+
+### Tugas 8
+## Pertanyaan Reflektif
+1. **Jelaskan perbedaan antara Navigator.push(), Navigator.pushReplacement(), dan Navigator.pop(). Metode apa yang digunakan untuk membuka formulir dari kartu aksi? Jelaskan juga bagaimana opsi Home di drawer membawa pengguna kembali ke halaman utama.**
+- Navigator.push() digunakan untuk membuka halaman baru tanpa menghapus halaman sebelumnya dari navigation stack. Jadi, pengguna masih bisa kembali ke halaman sebelumnya menggunakan tombol Back.
+- Navigator.pushReplacement() digunakan untuk mengganti halaman yang sedang dibuka dengan halaman baru. Halaman sebelumnya tidak lagi berada di posisi aktif dalam navigation stack.
+- Navigator.pop() digunakan untuk menutup halaman yang sedang dibuka dan kembali ke halaman sebelumnya.
+
+Pada aplikasi ini, kartu aksi Add Experience dan Add Project menggunakan Navigator.push() untuk membuka halaman formulir. Dengan begitu, pengguna bisa kembali ke halaman utama setelah selesai mengisi formulir atau menekan tombol Back.
+
+Sementara itu, pada LeftDrawer, opsi Home menggunakan Navigator.pushReplacement() untuk membuka kembali MyHomePage. Dengan cara ini, halaman yang sedang dibuka langsung digantikan oleh halaman utama sehingga pengguna bisa kembali ke halaman Home dari halaman lain.
+
+2. **Bagaimana susunan Scaffold, AppBar, dan Drawer membantu menjaga struktur halaman tetap konsisten? Berikan satu contoh penggunaan warna tema portofolio di lebih dari satu halaman.**
+Scaffold digunakan sebagai kerangka utama setiap halaman. Di dalamnya terdapat AppBar sebagai bagian atas halaman, Drawer sebagai menu navigasi, dan body sebagai tempat menampilkan konten utama.
+
+Penggunaan struktur yang sama pada MyHomePage, ProjectFormPage, dan ExperienceFormPage membuat tampilan aplikasi lebih konsisten. Pengguna juga tidak perlu mempelajari ulang letak menu navigasi setiap kali berpindah halaman.
+
+Contohnya, warna utama portofolio diambil menggunakan Theme.of(context).colorScheme.primary. Warna ini digunakan sebagai warna latar AppBar di beberapa halaman dan juga sebagai warna utama tombol Save. Dengan begitu, tampilan setiap halaman tetap memiliki identitas warna yang sama.
+
+3. **Mengapa tata letak tersebut dipilih untuk formulir? Jelaskan peran widget pengatur jarak dan widget penggulir ketika ruang layar terbatas.**
+Formulir menggunakan Column karena susunan input lebih mudah dibaca jika ditampilkan secara vertikal, dari satu field ke field berikutnya. Khusus untuk pemilihan tanggal mulai dan selesai, digunakan Row agar kedua input bisa ditampilkan berdampingan.
+
+Widget SizedBox dan Padding digunakan untuk memberikan jarak antarfield maupun antara field dan tombol. Tujuannya supaya formulir tidak terlihat terlalu padat dan setiap bagian lebih mudah dibedakan.
+
+Selain itu, digunakan SingleChildScrollView agar seluruh isi formulir tetap bisa diakses dengan cara menggulir layar. Hal ini penting terutama ketika aplikasi dibuka di layar yang kecil atau ketika keyboard muncul saat pengguna sedang mengisi formulir. Dengan begitu, field maupun tombol Save tetap bisa dijangkau.
+
+4. **Apa peran GlobalKey<FormState>, validator, dan validate() saat tombol Simpan ditekan? Berikan satu contoh nilai yang ditolak oleh validasi dan jelaskan mengapa memilih jenis input atau papan ketik saja belum cukup.**
+- GlobalKey<FormState> digunakan untuk mengakses kondisi atau state dari widget Form. Melalui key ini, aplikasi bisa menjalankan proses validasi seluruh input ketika tombol Save ditekan.
+- validator berisi aturan untuk memeriksa apakah nilai yang dimasukkan pengguna sudah sesuai dengan ketentuan. Sementara itu, validate() digunakan untuk menjalankan seluruh validator pada field yang ada di dalam formulir.
+
+Contohnya, jika pengguna mengisi bagian Role / Position hanya dengan spasi seperti "   ", input tersebut akan ditolak karena dianggap belum mengisi data yang valid. Contoh lainnya adalah deskripsi yang kurang dari 10 karakter atau tanggal selesai yang lebih awal daripada tanggal mulai.
+
+Pemilihan jenis input dan keyboard saja belum cukup untuk memastikan data yang dimasukkan benar. Misalnya, penggunaan keyboard teks hanya memudahkan pengguna dalam mengetik, tetapi tidak bisa memastikan bahwa input tidak kosong atau hanya berisi spasi. Begitu juga dengan pemilihan tanggal, yang belum tentu mencegah pengguna memilih tanggal selesai sebelum tanggal mulai. Oleh karena itu, tetap diperlukan validasi untuk memastikan data yang disimpan sudah memenuhi ketentuan.
+
+## AI Disclosure
+- Tool yang Digunakan: Google Gemini
+- Tautan Log / Sesi percakapan: [Sesi Percakapan Gemini]()
+- Strategi Prompting:
+- Bagian yang Dibantu AI:
