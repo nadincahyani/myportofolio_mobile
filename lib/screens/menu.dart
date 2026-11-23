@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/widgets/left_drawer.dart';
 import 'package:myportofolio_mobile/widgets/project_card.dart';
 
@@ -11,16 +11,15 @@ class MyHomePage extends StatelessWidget {
 
   final List<ItemHomepage> items = [
     // Kategori Proyek
-    ItemHomepage("Lihat Proyek", Icons.folder, Colors.blue),
-    ItemHomepage("Tambah Proyek", Icons.add_circle, Colors.blueAccent),
+    ItemHomepage("View Projects", Icons.folder, Colors.blue),
+    ItemHomepage("Add Project", Icons.add_circle, Colors.blueAccent),
 
     // Kategori Edukasi
-    ItemHomepage("Lihat Edukasi", Icons.school, Colors.deepPurple),
-    ItemHomepage("Tambah Edukasi", Icons.add_box, Colors.purpleAccent),
+    ItemHomepage("View Education", Icons.school, Colors.deepPurple),
 
     // Kategori Pengalaman
-    ItemHomepage("Lihat Proyek", Icons.work, Colors.teal),
-    ItemHomepage("Tambah Proyek", Icons.playlist_add, Colors.green),
+    ItemHomepage("View Experiences", Icons.work, Colors.teal),
+    ItemHomepage("Add Experience", Icons.playlist_add, Colors.green),
 
     ItemHomepage("Logout", Icons.logout, Colors.red),
   ];
@@ -65,7 +64,7 @@ class MyHomePage extends StatelessWidget {
                     const Padding(
                       padding: EdgeInsets.only(top: 16.0),
                       child: Text(
-                        'Selamat datang di MyPortfolio Mobile!',
+                        'Welcome to MyPortfolio Mobile!',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18.0,
@@ -74,18 +73,20 @@ class MyHomePage extends StatelessWidget {
                     ),
 
                     // GridView menampilkan kartu tombol dalam tata letak kisi 3 kolom.
-                    GridView.count(
-                      primary: true,
-                      padding: const EdgeInsets.all(20),
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      crossAxisCount: 3,
-                      // shrinkWrap agar ukuran kisi menyesuaikan tinggi konten anak.
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: items.map((ItemHomepage item) {
-                        return ItemCard(item);
-                      }).toList(),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 700),
+                      child: GridView.count(
+                        primary: true,
+                        padding: const EdgeInsets.all(20),
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        crossAxisCount: 3,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: items.map((ItemHomepage item) {
+                          return ItemCard(item);
+                        }).toList(),
+                      ),
                     ),
                   ],
                 ),
@@ -129,12 +130,4 @@ class InfoCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class ItemHomepage {
-  final String name;
-  final IconData icon;
-  final Color color;
-
-  ItemHomepage(this.name, this.icon, this.color);
 }
