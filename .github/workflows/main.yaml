@@ -1,4 +1,4 @@
-Bagian 5: GitHub Actions CI/CDLangkah 5.1: Membuat .github/workflows/main.yamlBaru — .github/workflows/main.yaml: Menjalankan workflow build (VeryGoodOpenSource/very_good_workflows dengan min_coverage: 0) dan build_apk (needs: build) yang mengunggah build/app/outputs/flutter-apk/app-release.apk sebagai artefak app-release-apk.   YAMLname: CI
+name: CI
 
 on:
   push:
