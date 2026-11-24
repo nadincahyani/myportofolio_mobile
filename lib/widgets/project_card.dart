@@ -1,6 +1,9 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
+import 'package:myportofolio_mobile/screens/project_list_screen.dart';
+import 'package:myportofolio_mobile/services/auth_state.dart';
+import 'package:provider/provider.dart';
 
 class ItemHomepage {
   final String name;
@@ -24,7 +27,17 @@ class ItemCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         // Aksi ketika kartu ditekan oleh pengguna.
-        onTap: () {
+        onTap: () async {
+          if (item.name == 'View Projects' || item.name == 'Lihat Proyek') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProjectListScreen(),
+              ),
+            );
+            return;
+          }
+
           if (item.name == 'Add Project' || item.name == 'Tambah Proyek') {
             Navigator.push(
               context,
@@ -43,6 +56,28 @@ class ItemCard extends StatelessWidget {
             );
             return;
           }
+
+          if (item.name == 'Logout') {
+            final authState = context.read<AuthState>();
+            if (!authState.isLoggedIn) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  const SnackBar(content: Text("You are not logged in.")),
+                );
+              return;
+            }
+            await authState.logout();
+            if (!context.mounted) return;
+
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text("Logged out successfully!")),
+              );
+            return;
+          }
+
           // Menampilkan SnackBar dengan pesan interaktif.
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
