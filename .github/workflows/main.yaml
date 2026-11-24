@@ -33,5 +33,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-Langkah 5.2: Pemeriksaan Lokal Sebelum Push   
+          path: build/app/outputs/flutter-apk/app-release.apk  
