@@ -16,7 +16,7 @@ jobs:
       setup: dart run build_runner build --delete-conflicting-outputs
       coverage_excludes: "**/*.g.dart"
       min_coverage: 0
-    timeout_minutes: 15
+      timeout_minutes: 15
 
   build_apk:
     needs: build
