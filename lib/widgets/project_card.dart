@@ -1,8 +1,11 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:myportofolio_mobile/screens/project_form.dart';
+import 'package:myportofolio_mobile/screens/education_list_screen.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
+import 'package:myportofolio_mobile/screens/experience_list_screen.dart';
+import 'package:myportofolio_mobile/screens/project_form.dart';
 import 'package:myportofolio_mobile/screens/project_list_screen.dart';
 import 'package:myportofolio_mobile/services/auth_state.dart';
+import 'package:myportofolio_mobile/widgets/auth_guard.dart';
 import 'package:provider/provider.dart';
 
 class ItemHomepage {
@@ -26,8 +29,20 @@ class ItemCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        // Aksi ketika kartu ditekan oleh pengguna.
+        // Card.
         onTap: () async {
+          if (item.name == 'Education' ||
+              item.name == 'Edukasi' ||
+              item.name == 'View Education') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EducationListScreen(),
+              ),
+            );
+            return;
+          }
+
           if (item.name == 'View Projects' || item.name == 'Lihat Proyek') {
             Navigator.push(
               context,
@@ -39,6 +54,8 @@ class ItemCard extends StatelessWidget {
           }
 
           if (item.name == 'Add Project' || item.name == 'Tambah Proyek') {
+            final allowed = await ensureLoggedIn(context);
+            if (!allowed || !context.mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ProjectFormPage()),
@@ -46,8 +63,21 @@ class ItemCard extends StatelessWidget {
             return;
           }
 
+          if (item.name == 'View Experiences' ||
+              item.name == 'Lihat Pengalaman') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ExperienceListScreen(),
+              ),
+            );
+            return;
+          }
+
           if (item.name == 'Add Experience' ||
               item.name == 'Tambah Pengalaman') {
+            final allowed = await ensureLoggedIn(context);
+            if (!allowed || !context.mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(

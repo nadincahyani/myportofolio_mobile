@@ -8,19 +8,17 @@ class Education {
   final int? id;
   final String institution;
   final String degree;
-  final String fieldOfStudy;
-  final String startYear;
+  final int startYear;
   final String? endYear;
-  final String description;
+  final bool isOngoing;
 
   const Education({
     this.id,
     required this.institution,
     required this.degree,
-    required this.fieldOfStudy,
     required this.startYear,
     this.endYear,
-    this.description = '',
+    this.isOngoing = false,
   });
 
   factory Education.fromJson(Map<String, dynamic> json) =>

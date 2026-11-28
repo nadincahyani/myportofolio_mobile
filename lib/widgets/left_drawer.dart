@@ -1,11 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:myportofolio_mobile/screens/login_screen.dart';
 import 'package:myportofolio_mobile/screens/menu.dart';
-import 'package:myportofolio_mobile/screens/project_form.dart';
+import 'package:myportofolio_mobile/screens/education_list_screen.dart';
 import 'package:myportofolio_mobile/screens/experience_form.dart';
-import 'package:provider/provider.dart';
+import 'package:myportofolio_mobile/screens/experience_list_screen.dart';
+import 'package:myportofolio_mobile/screens/project_form.dart';
+import 'package:myportofolio_mobile/screens/project_list_screen.dart';
 import 'package:myportofolio_mobile/services/auth_state.dart';
 import 'package:myportofolio_mobile/widgets/auth_guard.dart';
+import 'package:provider/provider.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -55,6 +58,33 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+
+          ListTile(
+            leading: const Icon(Icons.school_outlined),
+            title: const Text('Education'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EducationListScreen(),
+                ),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.folder_open_outlined),
+            title: const Text('View Projects'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProjectListScreen(),
+                ),
+              );
+            },
+          ),
+
           ListTile(
             leading: const Icon(Icons.add_circle_outline),
             title: const Text('Add Project'),
@@ -70,10 +100,26 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+
           ListTile(
-            leading: const Icon(Icons.work_outline),
-            title: const Text('Add Experience'),
+            leading: const Icon(Icons.work_history_outlined),
+            title: const Text('View Experiences'),
             onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ExperienceListScreen(),
+                ),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.post_add_outlined),
+            title: const Text('Add Experience'),
+            onTap: () async {
+              final allowed = await ensureLoggedIn(context);
+              if (!allowed || !context.mounted) return;
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

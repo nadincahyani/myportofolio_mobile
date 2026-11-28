@@ -8,11 +8,11 @@ class ExperienceDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final endLabel = experience.isCurrent
-        ? 'Present'
-        : (experience.endDate != null && experience.endDate!.trim().isNotEmpty
-              ? experience.endDate!
-              : '-');
+    final period =
+        experience.dateDisplay != null &&
+            experience.dateDisplay!.trim().isNotEmpty
+        ? experience.dateDisplay!
+        : (experience.isOngoing ? 'Ongoing' : 'Completed');
 
     return Scaffold(
       appBar: AppBar(title: Text(experience.role)),
@@ -30,23 +30,22 @@ class ExperienceDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text('Organization: ${experience.organization}'),
-                if (experience.location.trim().isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text('Location: ${experience.location}'),
-                ],
                 const SizedBox(height: 6),
-                Text('Period: ${experience.startDate} - $endLabel'),
+                Text('Category: ${experience.category}'),
+                const SizedBox(height: 6),
+                Text('Period: $period'),
+                if (experience.documentationUrl != null &&
+                    experience.documentationUrl!.trim().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text('Documentation: ${experience.documentationUrl}'),
+                ],
                 const SizedBox(height: 12),
                 const Text(
                   'Description',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  experience.description.trim().isNotEmpty
-                      ? experience.description
-                      : 'No description provided.',
-                ),
+                Text(experience.description),
               ],
             ),
           ),

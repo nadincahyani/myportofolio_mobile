@@ -89,9 +89,7 @@ class _EducationListScreenState extends State<EducationListScreen> {
                 return Card(
                   child: ListTile(
                     title: Text(edu.institution),
-                    subtitle: Text(
-                      '${edu.degree} • ${edu.fieldOfStudy} (${edu.startYear})',
-                    ),
+                    subtitle: Text('${edu.degree} (${edu.startYear})'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       Navigator.push(

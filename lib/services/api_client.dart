@@ -87,18 +87,11 @@ class ApiClient {
   }
 
   Future<List<Education>> fetchEducations() async {
-    final uri = Uri.parse('$baseUrl/api/v1/educations/');
-    final response = await _httpClient.get(
-      uri,
+    final response = await _client.get(
+      _uri('/api/v1/education/'),
       headers: const {'Accept': 'application/json'},
     );
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
-        statusCode: response.statusCode,
-        message: 'Failed to load educations (${response.statusCode}).',
-      );
-    }
+    _ensureSuccess(response);
 
     final decoded = jsonDecode(response.body);
     final List<dynamic> items = decoded is List
@@ -106,8 +99,8 @@ class ApiClient {
         : (decoded is Map<String, dynamic> && decoded['results'] is List
               ? decoded['results'] as List<dynamic>
               : throw const ApiException(
-                  statusCode: 500,
-                  message: 'Unexpected response format for educations.',
+                  500,
+                  'Unexpected response format for educations.',
                 ));
 
     return items
@@ -116,18 +109,11 @@ class ApiClient {
   }
 
   Future<List<Experience>> fetchExperiences() async {
-    final uri = Uri.parse('$baseUrl/api/v1/experiences/');
-    final response = await _httpClient.get(
-      uri,
+    final response = await _client.get(
+      _uri('/api/v1/experience/'),
       headers: const {'Accept': 'application/json'},
     );
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
-        statusCode: response.statusCode,
-        message: 'Failed to load experiences (${response.statusCode}).',
-      );
-    }
+    _ensureSuccess(response);
 
     final decoded = jsonDecode(response.body);
     final List<dynamic> items = decoded is List
@@ -135,8 +121,8 @@ class ApiClient {
         : (decoded is Map<String, dynamic> && decoded['results'] is List
               ? decoded['results'] as List<dynamic>
               : throw const ApiException(
-                  statusCode: 500,
-                  message: 'Unexpected response format for experiences.',
+                  500,
+                  'Unexpected response format for experiences.',
                 ));
 
     return items
@@ -148,9 +134,8 @@ class ApiClient {
     Experience experience, {
     required String token,
   }) async {
-    final uri = Uri.parse('$baseUrl/api/v1/experiences/');
-    final response = await _httpClient.post(
-      uri,
+    final response = await _client.post(
+      _uri('/api/v1/experience/'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -158,15 +143,7 @@ class ApiClient {
       },
       body: jsonEncode(experience.toJson()),
     );
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(
-        statusCode: response.statusCode,
-        message: response.body.isNotEmpty
-            ? response.body
-            : 'Failed to create experience (${response.statusCode}).',
-      );
-    }
+    _ensureSuccess(response);
 
     final decoded = jsonDecode(response.body);
     if (decoded is Map<String, dynamic>) {

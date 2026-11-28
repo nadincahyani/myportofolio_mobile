@@ -1,5 +1,9 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:myportofolio_mobile/widgets/left_drawer.dart';
+import 'package:myportofolio_mobile/models/experience.dart';
+import 'package:myportofolio_mobile/services/api_client.dart';
+import 'package:myportofolio_mobile/services/auth_state.dart';
+import 'package:myportofolio_mobile/widgets/auth_guard.dart';
+import 'package:provider/provider.dart';
 
 class ExperienceFormPage extends StatefulWidget {
   const ExperienceFormPage({super.key});
@@ -13,250 +17,212 @@ class _ExperienceFormPageState extends State<ExperienceFormPage> {
 
   String _role = '';
   String _organization = '';
+  String _category = 'organization';
+  String _dateDisplay = '';
+  String _documentationUrl = '';
+  bool _isOngoing = true;
   String _description = '';
-  DateTime? _startDate;
-  DateTime? _endDate;
-  String? _dateErrorMessage;
+  bool _isSubmitting = false;
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'Select date';
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year.toString();
-    return '$day-$month-$year';
-  }
+  static const List<String> _categories = [
+    'organization',
+    'committee',
+    'teaching-assistant',
+    'volunteer',
+  ];
 
-  Future<void> _pickStartDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _startDate ?? DateTime(now.year, now.month - 1, now.day),
-      firstDate: DateTime(1970),
-      lastDate: DateTime(now.year + 10),
-    );
-    if (picked != null) {
-      setState(() {
-        _startDate = picked;
-        _validateDates();
-      });
-    }
-  }
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
 
-  Future<void> _pickEndDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _endDate ?? _startDate ?? now,
-      firstDate: DateTime(1970),
-      lastDate: DateTime(now.year + 10),
-    );
-    if (picked != null) {
-      setState(() {
-        _endDate = picked;
-        _validateDates();
-      });
-    }
-  }
+    final messenger = ScaffoldMessenger.of(context);
+    final apiClient = context.read<ApiClient>();
+    final authState = context.read<AuthState>();
 
-  bool _validateDates() {
-    if (_startDate == null || _endDate == null) {
-      setState(() {
-        _dateErrorMessage = 'Both start date and end date are required.';
-      });
-      return false;
-    }
-    if (_endDate!.isBefore(_startDate!)) {
-      setState(() {
-        _dateErrorMessage = 'End date cannot be earlier than start date.';
-      });
-      return false;
-    }
-    setState(() {
-      _dateErrorMessage = null;
-    });
-    return true;
-  }
+    final allowed = await ensureLoggedIn(context);
+    if (!allowed || !mounted) return;
 
-  void _handleSave() {
-    final isFormValid = _formKey.currentState?.validate() ?? false;
-    final isDateValid = _validateDates();
-
-    if (!isFormValid || !isDateValid) {
+    final token = authState.token;
+    if (token == null || token.isEmpty) {
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Authentication token not found.')),
+        );
       return;
     }
 
-    _formKey.currentState!.save();
+    setState(() {
+      _isSubmitting = true;
+    });
 
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Experience Summary'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                Text('Role / Position: $_role'),
-                const SizedBox(height: 6),
-                Text('Organization / Company: $_organization'),
-                const SizedBox(height: 6),
-                Text('Start Date: ${_formatDate(_startDate)}'),
-                const SizedBox(height: 6),
-                Text('End Date: ${_formatDate(_endDate)}'),
-                const SizedBox(height: 6),
-                Text('Description: $_description'),
-              ],
-            ),
-          ),
+    final newExperience = Experience(
+      role: _role.trim(),
+      organization: _organization.trim(),
+      category: _category,
+      dateDisplay: _dateDisplay.trim().isEmpty ? null : _dateDisplay.trim(),
+      documentationUrl: _documentationUrl.trim().isEmpty
+          ? null
+          : _documentationUrl.trim(),
+      isOngoing: _isOngoing,
+      description: _description.trim(),
+    );
+
+    try {
+      final created = await apiClient.createExperience(
+        newExperience,
+        token: token,
+      );
+      if (!mounted) return;
+
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Experience added!'),
+          content: Text('${created.role} at ${created.organization} saved.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
               child: const Text('OK'),
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      if (e.statusCode == 401) {
+        await authState.logout();
+        if (!mounted) return;
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Session expired (401). Please log in again.'),
+            ),
+          );
+        await ensureLoggedIn(context);
+      } else {
+        messenger
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                'Failed to create experience (${e.statusCode}): ${e.message}',
+              ),
+            ),
+          );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('Unexpected error: $e')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Add Experience',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: colorScheme.primary,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      drawer: const LeftDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
+      appBar: AppBar(title: const Text('Add Experience')),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(12),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Role / Position *',
-                  hintText:
-                      'e.g., Discrete Mathematics & Logic Teaching Assistant',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Role *',
+                  border: OutlineInputBorder(),
                 ),
-                onChanged: (value) => _role = value,
-                onSaved: (value) => _role = value!.trim(),
-                validator: (value) {
-                  final trimmed = value?.trim() ?? '';
-                  if (trimmed.isEmpty) {
-                    return 'Role or position cannot be empty or whitespace only.';
-                  }
-                  if (trimmed.length < 3) {
-                    return 'Role or position must be at least 3 characters.';
-                  }
-                  if (trimmed.length > 100) {
-                    return 'Role or position must not exceed 100 characters.';
-                  }
-                  return null;
+                onChanged: (v) => _role = v,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Role cannot be empty!'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Organization *',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (v) => _organization = v,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Organization cannot be empty!'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                initialValue: _category,
+                decoration: const InputDecoration(
+                  labelText: 'Category',
+                  border: OutlineInputBorder(),
+                ),
+                items: _categories
+                    .map(
+                      (c) => DropdownMenuItem<String>(value: c, child: Text(c)),
+                    )
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) setState(() => _category = val);
                 },
               ),
-              const SizedBox(height: 14.0),
+              const SizedBox(height: 12),
               TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Organization / Company *',
-                  hintText: 'e.g., Faculty of Computer Science, Universitas Indonesia',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Date Display (e.g. May 2026 - Present)',
+                  border: OutlineInputBorder(),
                 ),
-                onChanged: (value) => _organization = value,
-                onSaved: (value) => _organization = value!.trim(),
-                validator: (value) {
-                  final trimmed = value?.trim() ?? '';
-                  if (trimmed.isEmpty) {
-                    return 'Organization or company is required.';
-                  }
-                  if (trimmed.length < 3) {
-                    return 'Organization name must be at least 3 characters.';
-                  }
-                  if (trimmed.length > 100) {
-                    return 'Organization name must not exceed 100 characters.';
-                  }
-                  return null;
-                },
+                onChanged: (v) => _dateDisplay = v,
               ),
-              const SizedBox(height: 14.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _pickStartDate,
-                      icon: const Icon(Icons.calendar_today),
-                      label: Text('Start: ${_formatDate(_startDate)}'),
-                    ),
-                  ),
-                  const SizedBox(width: 10.0),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _pickEndDate,
-                      icon: const Icon(Icons.event_available),
-                      label: Text('End: ${_formatDate(_endDate)}'),
-                    ),
-                  ),
-                ],
-              ),
-              if (_dateErrorMessage != null) ...[
-                const SizedBox(height: 6.0),
-                Text(
-                  _dateErrorMessage!,
-                  style: TextStyle(color: colorScheme.error, fontSize: 12.5),
-                ),
-              ],
-              const SizedBox(height: 14.0),
+              const SizedBox(height: 12),
               TextFormField(
-                maxLines: 3,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
+                  labelText: 'Documentation URL (Optional)',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (v) => _documentationUrl = v,
+              ),
+              const SizedBox(height: 12),
+              SwitchListTile(
+                title: const Text('Ongoing'),
+                value: _isOngoing,
+                onChanged: (val) => setState(() => _isOngoing = val),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                maxLines: 4,
+                decoration: const InputDecoration(
                   labelText: 'Description *',
-                  hintText:
-                      'Describe your key responsibilities or highlights...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                  border: OutlineInputBorder(),
                 ),
-                onChanged: (value) => _description = value,
-                onSaved: (value) => _description = value!.trim(),
-                validator: (value) {
-                  final trimmed = value?.trim() ?? '';
-                  if (trimmed.isEmpty) {
-                    return 'Description cannot be empty or whitespace only.';
-                  }
-                  if (trimmed.length < 10) {
-                    return 'Description must be at least 10 characters.';
-                  }
-                  if (trimmed.length > 300) {
-                    return 'Description must not exceed 300 characters.';
-                  }
-                  return null;
-                },
+                onChanged: (v) => _description = v,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Description cannot be empty!'
+                    : null,
               ),
-              const SizedBox(height: 22.0),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                ),
-                onPressed: _handleSave,
-                child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submit,
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Save'),
                 ),
               ),
             ],

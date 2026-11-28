@@ -8,10 +8,11 @@ class EducationDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final period =
-        education.endYear != null && education.endYear!.trim().isNotEmpty
-        ? '${education.startYear} - ${education.endYear}'
-        : '${education.startYear} - Present';
+    final endLabel = education.isOngoing
+        ? 'Present'
+        : (education.endYear != null && education.endYear!.trim().isNotEmpty
+              ? education.endYear!
+              : '-');
 
     return Scaffold(
       appBar: AppBar(title: Text(education.institution)),
@@ -30,19 +31,10 @@ class EducationDetailScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text('Degree: ${education.degree}'),
                 const SizedBox(height: 6),
-                Text('Field of Study: ${education.fieldOfStudy}'),
+                Text('Period: ${education.startYear} - $endLabel'),
                 const SizedBox(height: 6),
-                Text('Period: $period'),
-                const SizedBox(height: 12),
-                const Text(
-                  'Description',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
                 Text(
-                  education.description.trim().isNotEmpty
-                      ? education.description
-                      : 'No description provided.',
+                  'Status: ${education.isOngoing ? 'Ongoing' : 'Completed'}',
                 ),
               ],
             ),

@@ -108,7 +108,9 @@ class _ExperienceListScreenState extends State<ExperienceListScreen> {
                 return Card(
                   child: ListTile(
                     title: Text(exp.role),
-                    subtitle: Text('${exp.organization} • ${exp.startDate}'),
+                    subtitle: Text(
+                      '${exp.organization} • ${exp.dateDisplay ?? exp.category}',
+                    ),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       Navigator.push(

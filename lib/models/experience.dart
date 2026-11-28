@@ -5,24 +5,24 @@ part 'experience.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Experience {
   @JsonKey(includeToJson: false)
-  final int? id;
+  final String? id;
   final String role;
   final String organization;
-  final String location;
-  final String startDate;
-  final String? endDate;
-  final bool isCurrent;
   final String description;
+  final String category;
+  final String? dateDisplay;
+  final String? documentationUrl;
+  final bool isOngoing;
 
   const Experience({
     this.id,
     required this.role,
     required this.organization,
-    this.location = '',
-    required this.startDate,
-    this.endDate,
-    this.isCurrent = false,
-    this.description = '',
+    required this.description,
+    this.category = 'organization',
+    this.dateDisplay,
+    this.documentationUrl,
+    this.isOngoing = true,
   });
 
   factory Experience.fromJson(Map<String, dynamic> json) =>
